@@ -1,0 +1,25 @@
+<div [ngClass]="{
+  'flag' : cell.flagged ,
+  'mine' : cell.shown && cell.mined,
+  'zero' : cell.value === 0 && cell.shown && !cell.mined,
+  'one' : cell.value === 1 && cell.shown && !cell.mined,
+  'two' : cell.value === 2 && cell.shown && !cell.mined,
+  'three' : cell.value === 3 && cell.shown && !cell.mined,
+  'four' : cell.value === 4 && cell.shown && !cell.mined,
+  'five' : cell.value === 5 && cell.shown && !cell.mined,
+  'six' : cell.value === 6 && cell.shown && !cell.mined,
+  'seven' : cell.value === 7 && cell.shown && !cell.mined,
+  'eight' : cell.value === 8 && cell.shown && !cell.mined,
+  'shown' : !cell.shown && !cell.flagged,
+  'wrong' : cell.flagged && !cell.mined && cell.shown,
+  'cell' : true
+}"></div>
+
+<!--
+1. arr => arr.reduce((acc, val,) => (acc * val))**(1/arr.length)
+2. JSON.stringify(Object.keys(obj1)) === JSON.stringify(Object.keys(obj3))
+3. JSON.stringify(Object.values(obj1)) === JSON.stringify(Object.values(obj3))
+4. array.map((obj) => (obj.end - obj.start))
+5. Object.entries(obj).filter(([_, value]) => value).map(([key]) => key).join(' ')
+6. f = array => [Object.keys(array[0]), ...array.map((item) => Object.keys(item).map(key => item[key]))]
+-->
