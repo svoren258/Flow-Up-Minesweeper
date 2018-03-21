@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { BoardService } from './board.service';
 
 @Component({
   selector: 'ms-root',
@@ -6,5 +7,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'ms';
+  constructor(public boardService: BoardService) {}
+
 }
+
