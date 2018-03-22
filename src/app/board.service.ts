@@ -173,6 +173,11 @@ export class BoardService {
 
   setFlag(y: number, x: number): void {
     const board = this.board.getValue();
+    if (this.isFirstCellShown(y, x)) {
+      this.gameState = GameState.inProggress;
+      this.getTime();
+    }
+
     if (board.cells[y][x].shown) {
       return;
     }
@@ -185,6 +190,7 @@ export class BoardService {
         )
       )
     });
+    this.winner();
   }
 
   resetGame(): void {
@@ -203,6 +209,7 @@ export class BoardService {
         this.time.next(seconds + 1);
       });
   }
+
   play(y: number, x: number): void {
     if (this.isFirstCellShown(y, x)) {
       this.gameState = GameState.inProggress;
@@ -212,10 +219,13 @@ export class BoardService {
   }
 
   isFirstCellShown(y: number, x: number): boolean {
+    if (this.gameState === GameState.inProggress) {
+      return false;
+    }
     const board = this.board.getValue();
     return !board.cells.some(
       (row, y) => row.some(
-        (cell, x) => (board.cells[y][x].shown)
+        (cell, x) => (board.cells[y][x].shown || board.cells[y][x].flagged)
       )
     );
   }
