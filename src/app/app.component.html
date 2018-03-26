@@ -6,49 +6,50 @@
     <p>Mines Remaining: {{boardService.minesRemain}}</p>
     <ms-timer></ms-timer>
   </div>
-  <div class="board">
-    <ms-board></ms-board>
-    <div *ngIf="boardService.gameState === 1" class="lost">
-      <h2>
-        YOU LOSE!
-      </h2>
-    </div>
-    <div *ngIf="boardService.gameState === 2" class="win">
-      <h2>
-        YOU WIN!
-      </h2>
+  <div class="center">
+    <form class="form" (ngSubmit)="boardService.onSubmit(f)" #f="ngForm">
+      <label for="width">Width:</label>
+      <input
+        type="text"
+        id="width"
+        [ngModel]="boardService.defaultWidth"
+        name="width"
+        #width
+      >
+      <label for="height">Height:</label>
+      <input
+        type="text"
+        id="height"
+        [ngModel]="boardService.defaultHeight"
+        name="height"
+        #height
+      >
+      <label for="mines">Mines:</label>
+      <input
+        type="text"
+        id="mines"
+        [ngModel]="boardService.mineCount"
+        name="mines"
+        #mines
+      >
+      <button
+        type="submit"
+      >
+        New Game
+      </button>
+    </form>
+    <div class="board">
+      <ms-board></ms-board>
+      <div *ngIf="boardService.gameState === 1" class="lost">
+        <h2>
+          YOU LOSE!
+        </h2>
+      </div>
+      <div *ngIf="boardService.gameState === 2" class="win">
+        <h2>
+          YOU WIN!
+        </h2>
+      </div>
     </div>
   </div>
-
-  <form class="form" (ngSubmit)="boardService.onSubmit(f)" #f="ngForm">
-    <label for="width">Width:</label>
-    <input
-      type="text"
-      id="width"
-      [ngModel]="boardService.defaultWidth"
-      name="width"
-      #width
-    >
-    <label for="height">Height:</label>
-    <input
-      type="text"
-      id="height"
-      [ngModel]="boardService.defaultHeight"
-      name="height"
-      #height
-    >
-    <label for="mines">Mines:</label>
-    <input
-      type="text"
-      id="mines"
-      [ngModel]="boardService.mineCount"
-      name="mines"
-      #mines
-    >
-    <button
-      type="submit"
-    >
-      New Game
-    </button>
-  </form>
 </div>
