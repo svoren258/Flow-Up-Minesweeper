@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 import { BoardService } from '../board.service';
-import { Board } from '../board/board.model';
+
 
 @Component({
   selector: 'ms-timer',

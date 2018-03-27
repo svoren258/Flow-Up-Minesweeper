@@ -1,35 +1,36 @@
-import { Injectable, ViewChild } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Board } from './board/board.model';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { interval } from 'rxjs/observable/interval';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
-import { NgForm } from '@angular/forms';
-
-export enum GameState {
-  inProggress = 0,
-  lost = 1,
-  won = 2,
-  waiting = 3,
-}
+import { GameState, GameStateModel } from './board/game-state.model';
+import { map } from 'rxjs/operators';
 
 const NEIGHBORHOOD: [number, number][] = [
   [-1, -1], [-1, 0], [-1, 1], [0, -1],
   [0, 1], [1, -1], [1, 0], [1, 1]
 ];
 
+export const DEFAULT_WIDTH = 8;
+export const DEFAULT_HEIGHT = 8;
+export const DEFAULT_MINES = 10;
+
 @Injectable()
 export class BoardService {
-  defaultHeight = 8;
-  defaultWidth = 8;
-  mineCount = 10;
-  minesRemain = 10;
-  timeSubscription: Subscription;
-  private board = new BehaviorSubject<Board>(null);
-  board$ = this.board.asObservable();
-  private time = new BehaviorSubject<number>(null);
-  time$ = this.time.asObservable();
-  gameState = GameState.waiting;
+  private state = new BehaviorSubject<GameStateModel>(null);
+  private timeSubscription: Subscription;
+  board$ = this.state.pipe(
+    map(state => state.board)
+  );
+  time$ = this.state.pipe(
+    map(state => state.time)
+  );
+  minesRemain$ = this.state.pipe(
+    map(state => state.minesRemain)
+  );
+  gameState$ = this.state.pipe(
+    map(state => state.state)
+  );
 
   static setCellValue(board: Board): Board {
     return {
@@ -51,19 +52,20 @@ export class BoardService {
   }
 
   constructor() {
-    this.createBoard();
+    this.resetGame(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_MINES);
   }
 
-  createBoard(): void {
+  createBoard(width: number, height: number, mineCount: number): void {
+    const state = this.state.getValue();
     let mines: [number, number][];
-    mines = this.placeMines();
+    mines = this.placeMines(width, height, mineCount);
 
     const newBoard: Board = {
-      height: this.defaultHeight,
-      width: this.defaultWidth,
-      cells: new Array(this.defaultHeight)
+      height: height,
+      width: width,
+      cells: new Array(height)
         .fill(0)
-        .map((_, y) => new Array(this.defaultWidth)
+        .map((_, y) => new Array(width)
           .fill(0)
           .map((__, x) => ({
             value: 0,
@@ -75,21 +77,24 @@ export class BoardService {
     };
 
     const filledBoard = BoardService.setCellValue(newBoard);
-    this.board.next(filledBoard);
+    this.state.next({
+      ...state,
+            board: filledBoard
+    });
   }
 
   private contains(mineArray: [number, number][], mine: [number, number]): boolean {
     return mineArray.some(m => mine[0] === m[0] && mine[1] === m[1]);
   }
 
-  placeMines(): [number, number][] {
+  placeMines(boardWidth: number, boardHeight: number, mineCount: number): [number, number][] {
     const mines: [number, number][] = [];
-    for (let x = 0; x < this.mineCount; x++) {
+    for (let x = 0; x < mineCount; x++) {
       let xy: [number, number];
       do {
         xy = [
-          Math.floor(Math.random() * this.defaultHeight),
-          Math.floor(Math.random() * this.defaultWidth)
+          Math.floor(Math.random() * boardHeight),
+          Math.floor(Math.random() * boardWidth)
         ];
       } while (this.contains(mines, xy));
       mines.push(xy);
@@ -98,18 +103,18 @@ export class BoardService {
   }
 
   uncoverMultipleCells(y: number, x: number): void {
-    const board = this.board.getValue();
+    const state = this.state.getValue();
     for (let i = y - 1; i <= y + 1; i++) {
       for (let j = x - 1; j <= x + 1; j++) {
         if ((i === y && j === x)
           || (i < 0)
           || (j < 0)
-          || (i > board.height - 1)
-          || (j > board.width - 1)) {
+          || (i > state.board.height - 1)
+          || (j > state.board.width - 1)) {
           continue;
         }
-        if (!board.cells[i][j].shown
-          && !board.cells[i][j].mined) {
+        if (!state.board.cells[i][j].shown
+          && !state.board.cells[i][j].mined) {
           this.uncoverCell(i, j);
         }
       }
@@ -117,124 +122,140 @@ export class BoardService {
   }
 
   uncoverCell(y: number, x: number): void {
-    const board = this.board.getValue();
-    if (board.cells[y][x].flagged) {
+    const state = this.state.getValue();
+    if (state.board.cells[y][x].flagged) {
       return;
     }
-
-    this.board.next({
-      ...board,
-      cells: board.cells.map(
+    this.state.next({
+      ...state,
+      board: {
+        ...state.board,
+        cells: state.board.cells.map(
         (row, dy) => row.map(
           (cell, dx) => (dx === x && dy === y ? {...cell, shown: true} : cell)
         )
-      )
+      )}
     });
-
-    if (board.cells[y][x].mined) {
+    if (state.board.cells[y][x].mined) {
       this.endGame();
       return;
     }
-    if (board.cells[y][x].value === 0) {
+    if (state.board.cells[y][x].value === 0) {
       this.uncoverMultipleCells(y, x);
     }
   }
 
   winner(): void {
+    const state = this.state.getValue();
     if (this.amIWinner()) {
-      this.gameState = GameState.won;
+      this.state.next({
+        ...state,
+        state: GameState.won
+      });
       this.timeSubscription.unsubscribe();
     }
   }
 
   endGame(): void {
-    const board = this.board.getValue();
-    this.board.next({
-      ...board,
-      cells: board.cells.map(
+    const state = this.state.getValue();
+    this.state.next({
+      ...state,
+      board: {
+      ...state.board,
+      cells: state.board.cells.map(
         (row) => row.map(
           (cell) => ({...cell, shown: (cell.mined || cell.shown) || (cell.flagged && !cell.mined)})
         )
-      )
+      )},
+      state: GameState.lost
     });
 
-    this.gameState = GameState.lost;
     this.timeSubscription.unsubscribe();
   }
 
   amIWinner(): boolean {
-    const board = this.board.getValue();
-    return this.board.getValue().cells.every(
+    const state = this.state.getValue();
+    return this.state.getValue().board.cells.every(
       (row, y) => row.every(
-        (cell, x) => (board.cells[y][x].shown || (board.cells[y][x].mined && board.cells[y][x].flagged))
+        (cell, x) => (state.board.cells[y][x].shown || (state.board.cells[y][x].mined && state.board.cells[y][x].flagged))
       )
     );
   }
 
   setFlag(y: number, x: number): void {
-    const board = this.board.getValue();
+    const state = this.state.getValue();
     if (this.isFirstCellShown(y, x)) {
-      this.gameState = GameState.inProggress;
+      this.state.next({
+        ...state,
+        state: GameState.inProggress
+      });
       this.getTime();
     }
-
-    if (board.cells[y][x].shown) {
+    if (state.board.cells[y][x].shown) {
       return;
     }
-    board.cells[y][x].flagged ? this.minesRemain++ : this.minesRemain--;
-    this.board.next({
-      ...board,
-      cells: board.cells.map(
-        (row, dy) => row.map(
-          (cell, dx) => (dy === y && dx === x ? {...cell, flagged: !(cell.flagged || cell.shown)} : cell)
-        )
-      )
+    this.state.next({
+      ...state,
+      board: {
+        ...state.board,
+        cells: state.board.cells.map(
+          (row, dy) => row.map(
+            (cell, dx) => (dy === y && dx === x ? {...cell, flagged: !(cell.flagged || cell.shown)} : cell)
+          )
+        )},
+      minesRemain: state.minesRemain + (state.board.cells[y][x].flagged ? 1 : -1)
     });
     this.winner();
   }
 
-  resetGame(): void {
-    this.createBoard();
-    if (this.gameState === GameState.inProggress) {
+  resetGame(boardWidth: number, boardHeight: number, mines: number): void {
+    this.createBoard(boardWidth, boardHeight, mines);
+    const state = this.state.getValue();
+    if (state.state === GameState.inProggress) {
       this.timeSubscription.unsubscribe();
     }
-    this.gameState = GameState.waiting;
-    this.time.next(0);
+    this.state.next({
+      ...state,
+      state: GameState.waiting,
+      minesRemain: mines,
+      time: 0,
+    });
   }
 
   getTime(): void {
     const timeCounter = Observable.interval(1000);
     this.timeSubscription = timeCounter.subscribe(
       (seconds: number) => {
-        this.time.next(seconds + 1);
+        const state = this.state.getValue();
+        this.state.next({
+          ...state,
+          time: seconds + 1
+        });
       });
   }
 
   play(y: number, x: number): void {
+    const state = this.state.getValue();
     if (this.isFirstCellShown(y, x)) {
-      this.gameState = GameState.inProggress;
+      this.state.next({
+        ...state,
+        state: GameState.inProggress
+      });
       this.getTime();
     }
     this.uncoverCell(y, x);
+    this.winner();
   }
 
   isFirstCellShown(y: number, x: number): boolean {
-    if (this.gameState === GameState.inProggress) {
+    const state = this.state.getValue();
+    if (state.state === GameState.inProggress) {
       return false;
     }
-    const board = this.board.getValue();
-    return !board.cells.some(
+    return !state.board.cells.some(
       (row, y) => row.some(
-        (cell, x) => (board.cells[y][x].shown || board.cells[y][x].flagged)
+        (cell, x) => (state.board.cells[y][x].shown || state.board.cells[y][x].flagged)
       )
     );
-  }
-
-  onSubmit(form: NgForm): void {
-    this.defaultHeight = parseInt(form.value.height, 10);
-    this.defaultWidth = parseInt(form.value.width, 10);
-    this.mineCount = parseInt(form.value.mines, 10);
-    this.minesRemain = parseInt(form.value.mines, 10);
-    this.resetGame();
   }
 }

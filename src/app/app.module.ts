@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { BoardComponent } from './board/board.component';
@@ -18,11 +18,11 @@ import { TimePipe } from './time.pipe';
     BoardComponent,
     CellComponent,
     TimerComponent,
-    TimePipe
+    TimePipe,
   ],
   imports: [
     BrowserModule,
-    FormsModule,
+    ReactiveFormsModule,
     AppRoutingModule
   ],
   providers: [BoardService],

@@ -10,12 +10,11 @@
 }
 
 .resizable {
-  postion: relative;
+  position: relative;
   overflow: hidden;
   resize: both;
-  min-height: 300px;
-  min-width: 300px;
-
+  height: 300px;
+  width: 300px;
 }
 
 .row {
@@ -23,6 +22,7 @@
   flex-shrink: 1;
   flex-grow: 1;
   flex-basis: 100%;
+  overflow: hidden;
 }
 
 .cell {

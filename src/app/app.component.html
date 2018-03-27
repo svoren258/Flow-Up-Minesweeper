@@ -3,34 +3,28 @@
     Minesweeper
   </h1>
   <div class="widgets">
-    <p>Mines Remaining: {{boardService.minesRemain}}</p>
+    <p>Mines Remaining: {{minesRemain$ | async}}</p>
     <ms-timer></ms-timer>
   </div>
   <div class="center">
-    <form class="form" (ngSubmit)="boardService.onSubmit(f)" #f="ngForm">
+    <form class="form" [formGroup]="boardSettings" (ngSubmit)="onSubmit()">
       <label for="width">Width:</label>
       <input
         type="text"
         id="width"
-        [ngModel]="boardService.defaultWidth"
-        name="width"
-        #width
+        formControlName="width"
       >
       <label for="height">Height:</label>
       <input
         type="text"
         id="height"
-        [ngModel]="boardService.defaultHeight"
-        name="height"
-        #height
+        formControlName="height"
       >
       <label for="mines">Mines:</label>
       <input
         type="text"
         id="mines"
-        [ngModel]="boardService.mineCount"
-        name="mines"
-        #mines
+        formControlName="mines"
       >
       <button
         type="submit"
@@ -40,12 +34,12 @@
     </form>
     <div class="board">
       <ms-board></ms-board>
-      <div *ngIf="boardService.gameState === 1" class="lost">
+      <div *ngIf="(gameState$ | async)  === 1" class="lost">
         <h2>
           YOU LOSE!
         </h2>
       </div>
-      <div *ngIf="boardService.gameState === 2" class="win">
+      <div *ngIf=" (gameState$ | async) === 2" class="win">
         <h2>
           YOU WIN!
         </h2>
