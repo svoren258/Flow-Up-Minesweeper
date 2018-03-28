@@ -223,7 +223,7 @@ export class BoardService {
     this.state.next({
       ...state,
       state: GameState.waiting,
-      minesRemain: mines,
+      minesRemain: Math.round((boardHeight * boardWidth * mines) / 100),
       time: 0,
     });
   }
