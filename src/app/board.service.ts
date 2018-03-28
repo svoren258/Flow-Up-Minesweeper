@@ -13,7 +13,7 @@ const NEIGHBORHOOD: [number, number][] = [
 
 export const DEFAULT_WIDTH = 8;
 export const DEFAULT_HEIGHT = 8;
-export const DEFAULT_MINES = 10;
+export const DEFAULT_MINES = 15;
 
 @Injectable()
 export class BoardService {
@@ -55,14 +55,11 @@ export class BoardService {
     this.resetGame(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_MINES);
   }
 
-  createBoard(width: number, height: number, mineCount: number): void {
-    if (mineCount >= height * width) {
-      alert('Wrong board settings!');
-      return;
-    }
+  createBoard(width: number, height: number, mines: number): void {
+    const mineCount = Math.round((width * height * mines) / 100);
     const state = this.state.getValue();
-    let mines: [number, number][];
-    mines = this.placeMines(width, height, mineCount);
+    let minesArray: [number, number][];
+    minesArray = this.placeMines(width, height, mineCount);
 
     const newBoard: Board = {
       height: height,
@@ -75,7 +72,7 @@ export class BoardService {
             value: 0,
             shown: false,
             flagged: false,
-            mined: this.contains(mines, [x, y])
+            mined: this.contains(minesArray, [x, y])
           }))
         )
     };
@@ -258,7 +255,6 @@ export class BoardService {
 
   isFirstCellShown(y: number, x: number): boolean {
     const state = this.state.getValue();
-    console.log(state.board.cells);
     if (state.state === GameState.inProggress) {
       return false;
     }

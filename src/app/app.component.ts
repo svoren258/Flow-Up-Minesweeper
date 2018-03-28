@@ -4,6 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { GameState } from './board/game-state.model';
 import { AbstractControlOptions } from '@angular/forms/src/model';
+import { integerRangeValidator } from './integer-range.validator';
 
 @Component({
   selector: 'ms-root',
@@ -12,9 +13,9 @@ import { AbstractControlOptions } from '@angular/forms/src/model';
 })
 export class AppComponent {
   boardSettings: FormGroup = new FormGroup({
-    width: new FormControl(DEFAULT_WIDTH, this.formValidator.bind(this)),
-    height: new FormControl(DEFAULT_HEIGHT, this.formValidator.bind(this)),
-    mines: new FormControl(DEFAULT_MINES, this.formValidator.bind(this))
+    width: new FormControl(DEFAULT_WIDTH, integerRangeValidator(6, 50)),
+    height: new FormControl(DEFAULT_HEIGHT, integerRangeValidator(6, 50)),
+    mines: new FormControl(DEFAULT_MINES, integerRangeValidator(0, 100))
   });
 
   minesRemain$: Observable<number>;
@@ -28,13 +29,4 @@ export class AppComponent {
     const {width, height, mines} = this.boardSettings.value;
     this.boardService.resetGame(Number(width), Number(height), Number(mines));
   }
-
-  formValidator(control: FormControl): {[s: string]: boolean} {
-    if (!Number.isInteger(Number(control.value)) || control.value < 6 || control.value > 50) {
-      return {invalid : true};
-    }
-    return null;
-  }
-
 }
-
