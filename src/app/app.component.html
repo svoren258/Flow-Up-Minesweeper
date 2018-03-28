@@ -26,7 +26,7 @@
         id="mines"
         formControlName="mines"
       >
-      <button
+      <button [disabled]="boardSettings.invalid"
         type="submit"
       >
         New Game

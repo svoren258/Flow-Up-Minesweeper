@@ -56,6 +56,10 @@ export class BoardService {
   }
 
   createBoard(width: number, height: number, mineCount: number): void {
+    if (mineCount >= height * width) {
+      alert('Wrong board settings!');
+      return;
+    }
     const state = this.state.getValue();
     let mines: [number, number][];
     mines = this.placeMines(width, height, mineCount);
@@ -164,7 +168,10 @@ export class BoardService {
       ...state.board,
       cells: state.board.cells.map(
         (row) => row.map(
-          (cell) => ({...cell, shown: (cell.mined || cell.shown) || (cell.flagged && !cell.mined)})
+          (cell) => ({
+            ...cell,
+            shown: (cell.mined || cell.shown)
+            || (cell.flagged && !cell.mined)})
         )
       )},
       state: GameState.lost
@@ -177,22 +184,24 @@ export class BoardService {
     const state = this.state.getValue();
     return this.state.getValue().board.cells.every(
       (row, y) => row.every(
-        (cell, x) => (state.board.cells[y][x].shown || (state.board.cells[y][x].mined && state.board.cells[y][x].flagged))
+        (cell, x) => (
+          (state.board.cells[y][x].shown && !state.board.cells[y][x].mined)
+          || (state.board.cells[y][x].mined && state.board.cells[y][x].flagged))
       )
     );
   }
 
   setFlag(y: number, x: number): void {
     const state = this.state.getValue();
+    if (state.board.cells[y][x].shown) {
+      return;
+    }
     if (this.isFirstCellShown(y, x)) {
       this.state.next({
         ...state,
         state: GameState.inProggress
       });
       this.getTime();
-    }
-    if (state.board.cells[y][x].shown) {
-      return;
     }
     this.state.next({
       ...state,
@@ -249,6 +258,7 @@ export class BoardService {
 
   isFirstCellShown(y: number, x: number): boolean {
     const state = this.state.getValue();
+    console.log(state.board.cells);
     if (state.state === GameState.inProggress) {
       return false;
     }
