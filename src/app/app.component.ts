@@ -13,9 +13,9 @@ import { integerRangeValidator } from './integer-range.validator';
 })
 export class AppComponent {
   boardSettings: FormGroup = new FormGroup({
-    width: new FormControl(DEFAULT_WIDTH, integerRangeValidator(6, 50)),
-    height: new FormControl(DEFAULT_HEIGHT, integerRangeValidator(6, 50)),
-    mines: new FormControl(DEFAULT_MINES, integerRangeValidator(0, 100))
+    width: new FormControl(DEFAULT_WIDTH, integerRangeValidator(5, 50)),
+    height: new FormControl(DEFAULT_HEIGHT, integerRangeValidator(5, 50)),
+    mines: new FormControl(DEFAULT_MINES, integerRangeValidator(10, 90))
   });
 
   minesRemain$: Observable<number>;
