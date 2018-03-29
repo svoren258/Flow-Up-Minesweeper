@@ -94,8 +94,8 @@ export class BoardService {
       let xy: [number, number];
       do {
         xy = [
-          Math.floor(Math.random() * boardHeight),
-          Math.floor(Math.random() * boardWidth)
+          Math.floor(Math.random() * boardWidth),
+          Math.floor(Math.random() * boardHeight)
         ];
       } while (this.contains(mines, xy));
       mines.push(xy);
