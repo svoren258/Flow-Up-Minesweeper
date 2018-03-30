@@ -1,4 +1,4 @@
-.window {
+.main-window {
   background: lightgrey;
   height: 100%;
   display: flex;
@@ -23,18 +23,18 @@
   align-items: center;
 }
 
-input {
+.user-input {
   border-bottom: 1px solid;
   margin: 5px;
 }
 
-h1 {
+.main-heading {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-h2 {
-  color: black;
+.other-heading {
+  color: #000000;
   font-size: 30px;
 }
 
@@ -56,15 +56,14 @@ h2 {
   margin: 5px;
 }
 
-button {
+.enter-btn {
   margin-bottom: 10px;
   width: 100px;
   height: 50px;
   border-radius: 5px;
-}
-
-button:hover {
-  background: lightgray;
+  &:hover {
+    background: #d2d5db;
+  }
 }
 
 .form {

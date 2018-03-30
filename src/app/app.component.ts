@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { BoardService, DEFAULT_HEIGHT, DEFAULT_MINES, DEFAULT_WIDTH } from './board.service';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { GameState } from './board/game-state.model';
-import { AbstractControlOptions } from '@angular/forms/src/model';
 import { integerRangeValidator } from './integer-range.validator';
 
 @Component({
@@ -12,6 +11,7 @@ import { integerRangeValidator } from './integer-range.validator';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  GameState = GameState;
   boardSettings: FormGroup = new FormGroup({
     width: new FormControl(DEFAULT_WIDTH, integerRangeValidator(5, 40)),
     height: new FormControl(DEFAULT_HEIGHT, integerRangeValidator(5, 40)),

@@ -1,9 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { Cell } from './cell.model';
+import { CellModel } from './cell.model';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { BoardService } from '../board.service';
-import { GameState } from '../board/game-state.model';
-import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'ms-cell',
@@ -11,11 +8,11 @@ import { Observable } from 'rxjs/Observable';
   styleUrls: ['./cell.component.scss']
 })
 export class CellComponent {
-  @Input() cell: Cell;
+  @Input() cell: CellModel;
 
   constructor(private sanitizer: DomSanitizer) {}
 
-  saveImageUrl(): SafeUrl {
+  safeImageUrl(): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(this.imageUrl());
   }
   imageUrl(): string {

@@ -1,5 +1,5 @@
-<div class="window">
-  <h1>
+<div class="main-window">
+  <h1 class="main-heading">
     Minesweeper
   </h1>
   <div class="widgets">
@@ -10,23 +10,28 @@
     <form class="form" [formGroup]="boardSettings" (ngSubmit)="onSubmit()">
       <label for="width">Width:</label>
       <input
+        class="user-input"
         type="text"
         id="width"
         formControlName="width"
       >
       <label for="height">Height:</label>
       <input
+        class="user-input"
         type="text"
         id="height"
         formControlName="height"
       >
       <label for="mines">Mines: [%]</label>
       <input
+        class="user-input"
         type="text"
         id="mines"
         formControlName="mines"
       >
-      <button [disabled]="boardSettings.invalid"
+      <button
+        class="enter-btn"
+        [disabled]="boardSettings.invalid"
         type="submit"
       >
         New Game
@@ -34,13 +39,13 @@
     </form>
     <div class="board">
       <ms-board></ms-board>
-      <div *ngIf="(gameState$ | async)  === 1" class="lost">
-        <h2>
+      <div *ngIf="(gameState$ | async)  === GameState.Lost" class="lost">
+        <h2 class="other-heading">
           YOU LOSE!
         </h2>
       </div>
-      <div *ngIf=" (gameState$ | async) === 2" class="win">
-        <h2>
+      <div *ngIf=" (gameState$ | async) === GameState.Won" class="win">
+        <h2 class="other-heading">
           YOU WIN!
         </h2>
       </div>

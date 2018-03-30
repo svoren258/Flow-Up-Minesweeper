@@ -15,5 +15,4 @@ export class TimerComponent {
   constructor(private boardService: BoardService) {
     this.time$ = this.boardService.time$;
   }
-
 }

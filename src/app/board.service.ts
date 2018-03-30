@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Board } from './board/board.model';
+import { BoardModel } from './board/board.model';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -32,7 +32,7 @@ export class BoardService {
     map(state => state.state)
   );
 
-  static setCellValue(board: Board): Board {
+  static setCellValue(board: BoardModel): BoardModel {
     return {
       ...board,
       cells: board.cells.map(
@@ -43,7 +43,7 @@ export class BoardService {
     };
   }
 
-  static setVal(board: Board, x: number, y: number): number {
+  static setVal(board: BoardModel, x: number, y: number): number {
     return NEIGHBORHOOD
       .map(([vy, vx]) => [y + vy, x + vx])
       .filter(([y, x]) => x >= 0 && y >= 0 && x < board.width && y < board.height)
@@ -61,7 +61,7 @@ export class BoardService {
     let minesArray: [number, number][];
     minesArray = this.placeMines(width, height, mineCount);
 
-    const newBoard: Board = {
+    const newBoard: BoardModel = {
       height: height,
       width: width,
       cells: new Array(height)
@@ -80,7 +80,7 @@ export class BoardService {
     const filledBoard = BoardService.setCellValue(newBoard);
     this.state.next({
       ...state,
-            board: filledBoard
+      board: filledBoard
     });
   }
 
@@ -132,10 +132,11 @@ export class BoardService {
       board: {
         ...state.board,
         cells: state.board.cells.map(
-        (row, dy) => row.map(
-          (cell, dx) => (dx === x && dy === y ? {...cell, shown: true} : cell)
+          (row, dy) => row.map(
+            (cell, dx) => (dx === x && dy === y ? {...cell, shown: true} : cell)
+          )
         )
-      )}
+      }
     });
     if (state.board.cells[y][x].mined) {
       this.endGame();
@@ -151,7 +152,7 @@ export class BoardService {
     if (this.amIWinner()) {
       this.state.next({
         ...state,
-        state: GameState.won
+        state: GameState.Won
       });
       this.timeSubscription.unsubscribe();
     }
@@ -162,16 +163,18 @@ export class BoardService {
     this.state.next({
       ...state,
       board: {
-      ...state.board,
-      cells: state.board.cells.map(
-        (row) => row.map(
-          (cell) => ({
-            ...cell,
-            shown: (cell.mined || cell.shown)
-            || (cell.flagged && !cell.mined)})
+        ...state.board,
+        cells: state.board.cells.map(
+          (row) => row.map(
+            (cell) => ({
+              ...cell,
+              shown: (cell.mined || cell.shown)
+              || (cell.flagged && !cell.mined)
+            })
+          )
         )
-      )},
-      state: GameState.lost
+      },
+      state: GameState.Lost
     });
 
     this.timeSubscription.unsubscribe();
@@ -196,7 +199,7 @@ export class BoardService {
     if (this.isFirstCellShown(y, x)) {
       this.state.next({
         ...state,
-        state: GameState.inProggress
+        state: GameState.InProggress
       });
       this.getTime();
     }
@@ -208,7 +211,8 @@ export class BoardService {
           (row, dy) => row.map(
             (cell, dx) => (dy === y && dx === x ? {...cell, flagged: !(cell.flagged || cell.shown)} : cell)
           )
-        )},
+        )
+      },
       minesRemain: state.minesRemain + (state.board.cells[y][x].flagged ? 1 : -1)
     });
     this.winner();
@@ -217,12 +221,12 @@ export class BoardService {
   resetGame(boardWidth: number, boardHeight: number, mines: number): void {
     this.createBoard(boardWidth, boardHeight, mines);
     const state = this.state.getValue();
-    if (state.state === GameState.inProggress) {
+    if (state.state === GameState.InProggress) {
       this.timeSubscription.unsubscribe();
     }
     this.state.next({
       ...state,
-      state: GameState.waiting,
+      state: GameState.Waiting,
       minesRemain: Math.round((boardHeight * boardWidth * mines) / 100),
       time: 0,
     });
@@ -245,7 +249,7 @@ export class BoardService {
     if (this.isFirstCellShown(y, x)) {
       this.state.next({
         ...state,
-        state: GameState.inProggress
+        state: GameState.InProggress
       });
       this.getTime();
     }
@@ -255,7 +259,7 @@ export class BoardService {
 
   isFirstCellShown(y: number, x: number): boolean {
     const state = this.state.getValue();
-    if (state.state === GameState.inProggress) {
+    if (state.state === GameState.InProggress) {
       return false;
     }
     return !state.board.cells.some(

@@ -1,13 +1,19 @@
 <div class="board resizable">
-  <div class="row"
-       *ngFor="let row of (board$ | async).cells; index as rowIndex">
-    <div class="cell"
-         *ngFor="let cell of row; index as columnIndex">
+  <div
+    class="row"
+    *ngFor="let row of (board$ | async).cells; index as rowIndex"
+  >
+    <div
+      class="cell"
+      *ngFor="let cell of row; index as columnIndex"
+    >
       <ms-cell
              [cell]="cell"
              (click)="onClick(rowIndex, columnIndex)"
-             (contextmenu)="onRightClick(rowIndex, columnIndex, $event)">
+             (contextmenu)="onRightClick(rowIndex, columnIndex, $event)"
+      >
       </ms-cell>
     </div>
   </div>
 </div>
+

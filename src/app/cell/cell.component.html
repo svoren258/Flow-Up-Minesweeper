@@ -1,3 +1,9 @@
-<div class="cell" [ngClass]="{'shown' : !cell.shown && !cell.flagged}">
-  <img class="imgSize" [src]="saveImageUrl()">
+<div
+  class="cell"
+  [ngClass]="{'shown' : !cell.shown && !cell.flagged}"
+>
+  <img
+    class="img-size"
+    [src]="safeImageUrl()"
+  >
 </div>

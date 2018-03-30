@@ -1,4 +1,4 @@
-export interface Cell {
+export interface CellModel {
   value?: number;
   shown: boolean;
   flagged: boolean;

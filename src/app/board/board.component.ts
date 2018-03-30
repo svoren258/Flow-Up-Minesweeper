@@ -1,8 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { BoardService } from '../board.service';
-import { Board } from './board.model';
+import { BoardModel } from './board.model';
 import { Observable } from 'rxjs/Observable';
-import { GameStateModel } from './game-state.model';
 
 @Component({
   selector: 'ms-board',
@@ -10,7 +9,7 @@ import { GameStateModel } from './game-state.model';
   styleUrls: ['./board.component.scss']
 })
 export class BoardComponent {
-  board$: Observable<Board>;
+  board$: Observable<BoardModel>;
 
   constructor(private boardService: BoardService) {
     this.board$ = this.boardService.board$;

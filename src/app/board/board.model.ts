@@ -1,7 +1,7 @@
-import { Cell } from '../cell/cell.model';
+import { CellModel } from '../cell/cell.model';
 
-export interface Board {
+export interface BoardModel {
   height: number;
   width: number;
-  cells: Cell[][];
+  cells: CellModel[][];
 }
